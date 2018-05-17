@@ -8,7 +8,7 @@
 .datePicker .container {
     position: relative;
     padding: 10px 5px;
-    width: 437px;
+    width: auto;
     border: 1px solid #ddd;
     font-size: 12px;
     box-sizing: border-box;
@@ -23,6 +23,7 @@
     font-size: 14px;
     font-weight: 700;
     color: #49f;
+    cursor: pointer;
 }
 
 .datePicker .prev {
@@ -37,23 +38,23 @@
     margin: 0;
     text-align: center;
 }
-.datePicker .disabled a,
-.datePicker .date-item a {
+.datePicker .disabled,
+.datePicker .date-item {
     display: inline-block;
     color:inherit;
     text-decoration: none;
     width: 100%;
     height: 100%;
 }
-.datePicker .date-item a:hover {
+.datePicker .date-item:hover {
     color: #fff;
     background: #a9d0fc;
 }
-.datePicker .date-item a.active {
+.datePicker .date-item.active {
     color: #fff;
     background: #49f;
 }
-.datePicker .disabled a {
+.datePicker .disabled {
     color: #ddd;
     background: transparent;
     cursor: default;
