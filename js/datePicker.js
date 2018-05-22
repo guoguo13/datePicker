@@ -19,7 +19,11 @@ function DatePicker(node, params) {
     var el = node;
     var elP = el.parentNode;
     var flagArrow = true;     // true，增加 ;false，减少
-    var curDate = getDates(new Date());
+    var curDate = {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1
+    };
+    curDate.days =  new Date(curDate.year,curDate.month,0).getDate();
     for( var k in params ) {
         options[k] = params[k];
     }
@@ -42,25 +46,23 @@ function DatePicker(node, params) {
         while(double > 0) {
             var calendar = createCalendar();
             dateBox.appendChild(calendar);
-            handleDate(true);
+            handleDate();
             double--;
         }
         return dateBox;
     },
 
-
     handleDate = function(flag) {
-        if(flag) {
-            if(curDate.month === 12 ) {
-                curDate.month = 1;
-                curDate.year = curDate.year + 1;
-            } else {
-                curDate.month++;
-            }
-        } 
-        curDate.monthDays = getDays(curDate.year,curDate.month);
-        curDate.startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
-        curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.monthDays).getDay();
+        if(curDate.month === 12 ) {
+            curDate.month = 1;
+            curDate.year = curDate.year + 1;
+        } else {
+            curDate.month++;
+        }
+        curDate.days = new Date(curDate.year, curDate.month, 0).getDate();
+        // curDate.startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
+        // curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.days).getDay();
+
     },
 
     createCalendar = function () {
@@ -81,14 +83,16 @@ function DatePicker(node, params) {
     createTable = function() {
         var tbody = creEle("tbody"); 
         var day = 0;
-        var rows = parseInt( ( curDate.monthDays + curDate.startDate + (6 - curDate.endDate) ) / 7 );
+        var startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
+        var endDate = new Date(curDate.year, curDate.month - 1, curDate.days).getDay();
+        var rows = parseInt( ( curDate.days + startDate + (6 - endDate) ) / 7 );
         for( var i = 0 ; i < rows; i++) {
             var tr = creEle("tr");
             for(var j = 0; j < 7; j++) {
                 if((j < curDate.startDate && i < 1) || (j > curDate.endDate && i == rows - 1)) {
                    tr.appendChild(createTd("")); 
                 } else {
-                    if(day > curDate.monthDays) break;
+                    if(day >= curDate.days) break;
                     day++;
                     tr.appendChild(createTd(day)); 
                 }   
@@ -105,7 +109,6 @@ function DatePicker(node, params) {
         } else {
             a.textContent = n;
             a.dataset.date = curDate.year + '-' + curDate.month + '-' + n;
-            
             a.className = new Date(a.dataset.date) >= new Date(options.startDate) ? "date-item" : "disabled";
         }
         td.appendChild(a);
@@ -135,9 +138,9 @@ function DatePicker(node, params) {
                 }
             }
             
-            curDate.monthDays = getDays(curDate.year,curDate.month);
+            curDate.days = new Date(curDate.year, curDate.month, 0).getDate();
             curDate.startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
-            curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.monthDays).getDay();
+            curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.days).getDay();
             elP.removeChild(elP.children[1]);
             elP.appendChild(createDom());
         }
@@ -149,34 +152,10 @@ function DatePicker(node, params) {
                 dateItems[i].classList.remove("active");
             }
             target.classList.add("active");
+            options.callback(selectedDate);
         }
     });
 };
-
-// 获取指定年的某月份有多少天
-function getDays(year,month) {
-    switch(month) {
-        case 1: case 3: case 5: case 7: case 8: case 10: case 12:  return 31;
-        case 2: return isLeapYear(year)? 28: 29;
-        case 4 : case 6: case 9: case 11: return 30;
-    }
-}
-
-// 获取年，月份，月第一天星期
-function getDates(day) {
-    year = day.getFullYear(),
-    month = day.getMonth() + 1,
-    date = day.getDate(),
-    monthDays = getDays(year,month),
-    startDate = new Date(year, month - 1, 1).getDay();
-    endDate = new Date(year, month - 1, monthDays).getDay();
-    return { year, month, date, startDate, endDate, monthDays };
-}
-
-// 判断当前年是否为闰年
-function isLeapYear(year) {
-    return year % 400 === 0 || (year % 4 ===0 && year % 100 !== 0);
-}
 
 /* 
  * @param {type} 需创建的元素
