@@ -1,6 +1,6 @@
 /*
  * @param {double} 是否显示双日历，默认为true
- * @param {format} 日期格式
+ * @param {format} 日期格式 支持yyyy/mm/dd和yyyy-mm-dd两种
  * @param {range} 是否支持选取日期范围，默认为false
  * @param {startDate} 初始可选取日期，此日期之前日期不可选择
  * @return {value} 返回选中值
@@ -18,7 +18,7 @@ function DatePicker(node, params) {
     };
     var el = node;
     var elP = el.parentNode;
-    var flagArrow = true;     // true，增加 ;false，减少
+    var startTime = null, endTime = null, isHide = false;
     var curDate = {
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1
@@ -37,22 +37,18 @@ function DatePicker(node, params) {
             wrapper = creEle("div", {className:"datePicker"}, container);
         return wrapper;
     },
-
-
     //判断是否显示双日历 
     getCalendar = function() {
-        var double = options.double ? 2: 1;
         var dateBox = creEle("div", {className:"date-box"});
-        while(double > 0) {
-            var calendar = createCalendar();
-            dateBox.appendChild(calendar);
+        var calendar = createCalendar();
+        dateBox.appendChild(calendar);
+        if(options.double) {
             handleDate();
-            double--;
+            dateBox.appendChild(createCalendar());
         }
         return dateBox;
     },
-
-    handleDate = function(flag) {
+    handleDate = function() {
         if(curDate.month === 12 ) {
             curDate.month = 1;
             curDate.year = curDate.year + 1;
@@ -60,11 +56,7 @@ function DatePicker(node, params) {
             curDate.month++;
         }
         curDate.days = new Date(curDate.year, curDate.month, 0).getDate();
-        // curDate.startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
-        // curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.days).getDay();
-
     },
-
     createCalendar = function () {
         var table = creEle("table"),
             thead = creEle("thead"),
@@ -107,54 +99,149 @@ function DatePicker(node, params) {
         if(n === "") {
             a.textContent = "";
         } else {
+            var format = options.format;
             a.textContent = n;
-            a.dataset.date = curDate.year + '-' + curDate.month + '-' + n;
+            format = format.replace(/yyyy/,curDate.year);
+            format = format.replace(/mm/,(curDate.month < 10 ? '0' + parseInt(curDate.month) : curDate.month ));
+            format = format.replace(/dd/,(n < 10 ? '0' + parseInt(n) : n ));
+            
+            a.dataset.date = format;
             a.className = new Date(a.dataset.date) >= new Date(options.startDate) ? "date-item" : "disabled";
+            if(new Date(a.dataset.date) >= new Date(startTime) && new Date(a.dataset.date) <= new Date(endTime) || (a.dataset.date == startTime)) {
+                a.classList.add("active");
+            }
         }
         td.appendChild(a);
         return td;
+    },
+    // Dom的移除与显示
+    handleDom = function(flag) {
+        var datePicker = find(elP.children,"datePicker");
+        if(datePicker) {
+            elP.removeChild(datePicker);
+            if(flag) return;
+        }
+        var dom = createDom();
+        dom.style.display = 'block';
+        elP.appendChild(dom);
     };
-    elP.appendChild(createDom());
+    // isHidden = function() {
+    //     if(isHide) {
+    //         isHide = false;
+    //         handleDom(true);
+    //     }
+    // };
+
+    el.addEventListener("focus", function() {
+        handleDom(false);
+    });
+    el.addEventListener("blur", function() {
+        console.log(isHide);
+        if(isHide) {
+            isHide = false;
+            handleDom(true);
+        }
+    });
     elP.addEventListener('click', function(e){
         var target = e.target;
         //日历前进/后退
         if(target.classList.contains("next")) {
-            elP.removeChild(elP.children[1]);
-            elP.appendChild(createDom());
+            handleDate();
+            handleDom(false);
         } else if(target.classList.contains("prev")) {
             if(options.double) {
-                if(curDate.month <= 4) {
-                    curDate.month = curDate.month + 8;
-                    curDate.year = curDate.year - 1;
-                } else {
-                    curDate.month = curDate.month - 4;
-                }
-            } else {
                 if(curDate.month <= 2) {
                     curDate.month = curDate.month + 10;
                     curDate.year = curDate.year - 1;
                 } else {
-                    curDate.month = curDate.month - 2;
+                    curDate.month = curDate.month - 3;
+                }
+            } else {
+                if(curDate.month <= 1) {
+                    curDate.month = curDate.month + 11;
+                    curDate.year = curDate.year - 1;
+                } else {
+                    curDate.month = curDate.month - 1;
                 }
             }
-            
             curDate.days = new Date(curDate.year, curDate.month, 0).getDate();
-            curDate.startDate = new Date(curDate.year, curDate.month - 1, 1).getDay();
-            curDate.endDate = new Date(curDate.year, curDate.month - 1, curDate.days).getDay();
-            elP.removeChild(elP.children[1]);
-            elP.appendChild(createDom());
+            handleDom(false);
         }
+        // 日期选中
         if(target.classList.contains("date-item")) {
-            var selectedDate = target.dataset.date;
             var dateItems = document.querySelectorAll(".date-item");
-            el.value = selectedDate;
-            for(var i = 0; i < dateItems.length; i++) {
-                dateItems[i].classList.remove("active");
+            var selectedDate = null;
+            if(!options.range) {
+                el.value = selectedDate = startTime = target.dataset.date;
+                curDate.year = startTime.match(/\d+/g)[0];
+                curDate.month = startTime.match(/\d+/g)[1];
+                curDate.days =  new Date(curDate.year,curDate.month,0).getDate();
+                for(var i = 0; i < dateItems.length; i++) {
+                    dateItems[i].classList.remove("active");
+                }
+                target.classList.add("active");
+                handleDom(true);
+            } else {
+                var curTime = target.dataset.date;
+                if(startTime) {
+                    if(endTime) {
+                        startTime = curTime;
+                        endTime = null;
+                        for(var i = 0; i < dateItems.length; i++) {
+                            dateItems[i].classList.remove("active");
+                        }
+                        target.classList.add("active");
+                    } else {
+                        if( new Date(curTime) >= new Date(startTime)) {
+                            endTime = curTime;
+                        } else {
+                            endTime = startTime;
+                            startTime = curTime;
+                        }
+                    }
+                } else {
+                    startTime = curTime;
+                    target.classList.add("active");
+                }
+                if(startTime && endTime) {
+                    for(var i = 0; i < dateItems.length; i++) {
+                        var itemDate = dateItems[i].dataset.date;
+                        if(new Date(itemDate) >= new Date(startTime) && new Date(itemDate) <= new Date(endTime)) {
+                            dateItems[i].classList.add("active");
+                        }
+                    }
+                    curDate.year = endTime.match(/\d+/g)[0];
+                    curDate.month = endTime.match(/\d+/g)[1];
+                    curDate.days =  new Date(curDate.year,curDate.month,0).getDate();
+                    selectedDate = startTime + '~' + endTime;
+                    el.value = selectedDate;
+                    handleDom(true);
+                }
             }
-            target.classList.add("active");
             options.callback(selectedDate);
         }
     });
+    window.addEventListener("click",function(e) {
+        e.stopPropagation();
+        var target = e.target;
+        if(!target.classList.contains("next") && !target.classList.contains("prev") && !target.classList.contains("date-item")) {
+            if(target != el) {
+                isHide = true;
+            }
+            return; 
+         }
+    });
+    // window.addEventListener("click",function(e) {
+    //     e.stopPropagation();
+    //     var target = e.target;
+    //     if(!target.classList.contains("next") && !target.classList.contains("prev") && !target.classList.contains("date-item")) {
+    //         if(target != el) {
+    //             isHide = true;
+    //         } 
+    //      }
+    //      isHidden();
+    // });
+
 };
 
 /* 
@@ -180,4 +267,14 @@ function creEle(type, props, children) {
     }
     return node;
 }
+
+function find(node,className) {
+    for(var i = 0; i < node.length; i++) {
+        if(node[i].classList.contains(className)) {
+            return node[i];
+        }
+    }
+    return null;
+}
+
 

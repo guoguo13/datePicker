@@ -1,7 +1,9 @@
 .wrapper {
     position: relative;
+    margin: 20px;
 }
 .datePicker {
+    display: none;
     position: absolute;
     z-index: 999;
 }

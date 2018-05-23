@@ -8,15 +8,66 @@
     <link rel="stylesheet" href="css/datePicker.css">
 </head>
 <body>
-    <div class="wrapper">
-        <input type="text" class="date" placeholder="yyyy-mm-dd">
+    <div>
+        <label for="doubleDatePicker">双日历</label>
+        <div class="wrapper">
+            <input type="text" name="doubleDatePicker" class="doubleDatePicker" placeholder="yyyy/mm/dd">
+        </div>
+    </div>
+    <div>
+        <label for="singeDatePicker">单日历</label>
+        <div class="wrapper">
+            <input type="text" name="singeDatePicker" class="singeDatePicker" placeholder="yyyy-mm-dd">
+        </div>
+
+    </div>
+    <div>
+        <label for="singeRangeDatePicker">单日历（可选取日期范围）</label>
+        <div class="wrapper">
+            <input type="text" name="singeRangeDatePicker" class="singeRangeDatePicker" placeholder="yyyy-mm-dd">
+        </div>
+
+    </div>
+    <div>
+        <label for="doubleRangeDatePicker">双日历（可选取日期范围）</label>
+        <div class="wrapper">
+            <input type="text" name="doubleRangeDatePicker" class="doubleRangeDatePicker" placeholder="yyyy-mm-dd">
+        </div>   
     </div>
     <script src="js/datePicker.js"></script>
     <script>
-        var datePicker = new DatePicker( document.querySelector(".date"), {
+        // {format} 日期格式 支持yyyy/mm/dd和yyyy-mm-dd两种
+        var datePicker = new DatePicker( document.querySelector(".doubleDatePicker"), {
             double: true,
+            format: 'yyyy/mm/dd',
+            range: false,
+            startDate: '2018/03/04',
+            callback: function(value) {
+                console.log(value)
+            }
+        });
+        var singeDatePicker = new DatePicker( document.querySelector(".singeDatePicker"), {
+            double: false,
             format: 'yyyy-mm-dd',
             range: false,
+            startDate: '2018-03-04',
+            callback: function(value) {
+                console.log(value)
+            }
+        });
+        var singeRangeDatePicker = new DatePicker( document.querySelector(".singeRangeDatePicker"), {
+            double: false,
+            format: 'yyyy-mm-dd',
+            range: true,
+            startDate: '2018-03-04',
+            callback: function(value) {
+                console.log(value)
+            }
+        });
+        var singeRangeDatePicker = new DatePicker( document.querySelector(".doubleRangeDatePicker"), {
+            double: true,
+            format: 'yyyy-mm-dd',
+            range: true,
             startDate: '2018-03-04',
             callback: function(value) {
                 console.log(value)
