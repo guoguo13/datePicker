@@ -58,18 +58,15 @@ function DatePicker(node, params) {
         curDate.days = new Date(curDate.year, curDate.month, 0).getDate();
     },
     createCalendar = function () {
-        var table = creEle("table"),
-            thead = creEle("thead"),
-            theadTr = creEle("tr"),
-            tbody = createTable(),
-            h4 = creEle("h4", {className:"month"}, curDate.year + '年' + curDate.month + '月');
-        var week = ["日","一","二","三","四","五","六"], weekHTML = '';
+        var week = ["日","一","二","三","四","五","六"], weeks = [];
         for(var i = 0; i < week.length; i++) {
-            weekHTML += '<td>' + week[i] + '</td>';
+            weeks.push(creEle('td',null,week[i]));
         }
-        theadTr.innerHTML = weekHTML;
-        thead.appendChild(theadTr);
-        table = creEle("table", {}, [thead, tbody]);
+        var tbody = createTable(),
+            theadTr = creEle("tr",null, weeks),
+            thead = creEle("thead",null,theadTr),
+            table = creEle("table", {}, [thead, tbody]);
+            h4 = creEle("h4", {className:"month"}, curDate.year + '年' + curDate.month + '月');
         return creEle("div", {className:"calendar-item"}, [h4, table]);
     },
     createTable = function() {
@@ -81,7 +78,7 @@ function DatePicker(node, params) {
         for( var i = 0 ; i < rows; i++) {
             var tr = creEle("tr");
             for(var j = 0; j < 7; j++) {
-                if((j < curDate.startDate && i < 1) || (j > curDate.endDate && i == rows - 1)) {
+                if((j < startDate && i < 1) || (j > endDate && i == rows - 1)) {
                    tr.appendChild(createTd("")); 
                 } else {
                     if(day >= curDate.days) break;
