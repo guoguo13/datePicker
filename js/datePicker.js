@@ -1,10 +1,3 @@
-/*
- * @param {double} 是否显示双日历，默认为true
- * @param {format} 日期格式 支持yyyy/mm/dd和yyyy-mm-dd两种
- * @param {range} 是否支持选取日期范围，默认为false
- * @param {startDate} 初始可选取日期，此日期之前日期不可选择
- * @return {value} 返回选中值
- */
 function DatePicker(node, params) {
     if(typeof node === 'undefined') {
         throw new Error('node is not Element');
