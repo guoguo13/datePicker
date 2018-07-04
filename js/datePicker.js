@@ -234,11 +234,6 @@ function DatePicker(node, params) {
 
 };
 
-/* 
- * @param {type} 需创建的元素
- * @param {props} 接收一个对象，用于添加属性, 可选
- * @param {children} 接收一个对象，用于添加子元素, 可选
-*/
 function creEle(type, props, children) {
     var node = document.createElement(type);
     var childs = children != null ? [].concat(children) : [];
