@@ -1,4 +1,5 @@
 # datePicker
+<<<<<<< HEAD
 双日历插件
 <br/>支持单日历，单日期，日期范围选择  
 
@@ -38,3 +39,8 @@ var datePicker = new DatePicker( document.querySelector(".doubleDatePicker"), {
 
 ## 未完成，待优化
   
+=======
+双日历插件 , 支持单日历，单日期，日期范围选择
+## Demo
+https://guoguo13.github.io/datePicker/
+>>>>>>> 1d3d6e03ac13de5501f10b5a7b9afde84f6a8c10
