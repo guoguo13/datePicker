@@ -8,11 +8,11 @@ https://guoguo13.github.io/datePicker/
 
 ### 参数说明
 
- * @param {double} 是否显示双日历，默认为true
- * @param {format} 日期格式 支持yyyy/mm/dd和yyyy-mm-dd两种
- * @param {range} 是否支持选取日期范围，默认为false
- * @param {startDate} 初始可选取日期，此日期之前日期不可选择
- * @return {value} 返回选中值
+  * @param {boolean} double 是否显示双日历，默认为true
+ * @param {string} format 日期格式 支持yyyy/mm/dd和yyyy-mm-dd两种
+ * @param {string} range 是否支持选取日期范围，默认为false
+ * @param {string} startDate初始可选取日期，此日期之前日期不可选择
+ * @return {string} value 返回选中值
  
 ```
 options = {
